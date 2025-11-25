@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f3f7ff;
+  --hot-yellow: #c7ff29;
+  --primary-bg: #f9f9f9;
+  --spacing: 12px;
+  --spacing-2: 80px;
+  /* Synced from Figma variable: CTA Primary hover */
+  --cta-hover: #e2ff91;
+  --card-bg: #fcfafe; /* Figma: Card BG */
+  --dark-4: #AEABB1;  /* Figma: Dark 4 */
+  --deep-black: #1a1d1c; /* Figma: Deep Black */
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+@keyframes subtle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes compass-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  60% {
+    transform: rotate(720deg); /* 2 full spins */
+  }
+  80% {
+    transform: rotate(705deg); /* slight overshoot back */
+  }
+  90% {
+    transform: rotate(722deg); /* slight overshoot forward */
+  }
+  100% {
+    transform: rotate(720deg); /* settle at north (2 * 360) */
+  }
+}
+
+@keyframes rain-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+}
+
