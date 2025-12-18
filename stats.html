@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Stats - Figma Replica</title>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      margin: 0 0 32px 0;
+      font-size: 32px;
+      color: #1A1D1C;
+      text-align: center;
+    }
+    .stat-box {
+      background: #f3f7ff;
+      border: 2px solid #C7FF29;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: #1A1D1C;
+    }
+    .signup-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 24px;
+    }
+    .signup-item {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .signup-name {
+      font-weight: 600;
+      color: #1A1D1C;
+      margin-bottom: 4px;
+    }
+    .signup-email {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .signup-time {
+      color: #999;
+      font-size: 12px;
+    }
+    .loading {
+      text-align: center;
+      color: #666;
+      padding: 24px;
+    }
+    .error {
+      background: #fee;
+      border: 2px solid #fcc;
+      color: #c33;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Signup Statistics</h1>
+    
+    <div class="stat-box">
+      <div class="stat-label">Total Signups</div>
+      <div class="stat-value" id="total-count">-</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-label">CTA Clicks</div>
+      <div class="stat-value" id="cta-count">-</div>
+    </div>
+
+    <div id="signup-list-container">
+      <div class="loading">Loading signup data...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, getDocs, getCountFromServer, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSrafhr6LJi7XOW1iKqsF0FsEPVJUFTYI",
+      authDomain: "figma-replica-mcp.firebaseapp.com",
+      projectId: "figma-replica-mcp",
+      storageBucket: "figma-replica-mcp.firebasestorage.app",
+      messagingSenderId: "1040913332206",
+      appId: "1:1040913332206:web:d3e6f5e7f5d8e0e0e0e0e0",
+      measurementId: "G-XXXXXXXXXX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadStats() {
+      try {
+        // Get signup count
+        const signupsRef = collection(db, 'signups');
+        const signupSnapshot = await getCountFromServer(signupsRef);
+        const signupCount = signupSnapshot.data().count;
+        document.getElementById('total-count').textContent = signupCount;
+
+        // Get CTA click count
+        const ctaRef = collection(db, 'cta_clicks');
+        const ctaSnapshot = await getCountFromServer(ctaRef);
+        const ctaCount = ctaSnapshot.data().count;
+        document.getElementById('cta-count').textContent = ctaCount;
+
+        // Get all signups
+        const signupsQuery = query(signupsRef, orderBy('timestamp', 'desc'));
+        const signupDocs = await getDocs(signupsQuery);
+        
+        const listContainer = document.getElementById('signup-list-container');
+        
+        if (signupDocs.empty) {
+          listContainer.innerHTML = '<div class="loading">No signups yet</div>';
+        } else {
+          let html = '<div class="signup-list">';
+          signupDocs.forEach(doc => {
+            const data = doc.data();
+            const date = data.timestamp?.toDate();
+            const timeStr = date ? date.toLocaleString() : 'Unknown time';
+            
+            html += `
+              <div class="signup-item">
+                <div class="signup-name">${data.name || 'Anonymous'}</div>
+                <div class="signup-email">${data.email || 'No email'}</div>
+                <div class="signup-time">${timeStr}</div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          listContainer.innerHTML = html;
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        document.getElementById('signup-list-container').innerHTML = 
+          `<div class="error">Error loading data: ${error.message}</div>`;
+      }
+    }
+
+    loadStats();
+  </script>
+</body>
+</html>

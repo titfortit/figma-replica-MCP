@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/figma-replica-MCP/',
   server: {
     port: 5173,
     // Enable automatic page refresh every 5 seconds
